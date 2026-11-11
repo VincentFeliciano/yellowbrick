@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { asset, resolve } from '$app/paths';
 	import { PILLARS, PROJECTS, SITE, usd, T2, T3, T4 } from '#lib';
 	import Frame from '#lib/components/Frame.svelte';
+	import Picture from '#lib/components/Picture.svelte';
 	import Placeholder from '#lib/components/Placeholder.svelte';
 
 	const [featured, ...others] = PROJECTS;
@@ -29,7 +30,12 @@
 	</div>
 
 	<div class="at" style={T2.a}>
-		<Placeholder label="The studio at work" />
+		<Picture
+			src={asset('images/studio-at-work.png')}
+			alt="Drawing of the studio at work: a desk set up, people building at their computers, and a call coming in."
+			width={1920}
+			height={1080}
+		/>
 	</div>
 
 	<ul class="at cards" style={T2.b}>
@@ -87,7 +93,12 @@
 <!-- screen4.png: about, and an invitation to get in touch. -->
 <Frame id="about">
 	<div class="at" style={T4.a}>
-		<Placeholder label="Studio portrait" />
+		<Picture
+			src={asset('images/office-portrait.png')}
+			alt="Drawing of two people waving in the Yellowbrick office, under the brick and the yellow brick sign."
+			width={709}
+			height={1001}
+		/>
 	</div>
 
 	<div class="at stack" style={T4.b}>
