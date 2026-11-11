@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+@import '@fontsource/bebas-neue/latin-400.css';
+@import '@fontsource-variable/inter/wght.css';
+
+/* Brand tokens — from the Yellowbrick Brand and Website Style Guide. */
+@theme {
+	--color-brick: #ffc600;
+	--color-brick-dark: #e6b200;
+	--color-charcoal: #111316;
+	--color-charcoal-soft: #1c1f23;
+	--color-warm: #f5f2eb;
+	--color-steel: #8e9499;
+	/* Steel is too light for small text on warm white; use this for muted copy. */
+	--color-muted: #5b6168;
+	--color-line: #dedad0;
+	--color-placeholder: #d6d4cf;
+
+	--font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
+	--font-sans: 'Inter Variable', Inter, system-ui, sans-serif;
+}
+
+@layer base {
+	html {
+		scroll-behavior: smooth;
+	}
+	body {
+		@apply bg-warm font-sans text-charcoal antialiased;
+	}
+	::selection {
+		@apply bg-brick text-charcoal;
+	}
+	:focus-visible {
+		outline: 3px solid var(--color-brick);
+		outline-offset: 3px;
+	}
+
+	/* Pages built from full-screen panels settle on each panel as you scroll. */
+	html:has([data-panel]) {
+		scroll-snap-type: y proximity;
+		scroll-padding-top: 4.5rem;
+	}
+	[data-panel] {
+		scroll-snap-align: start;
+	}
+}
+
+@utility container-yb {
+	@apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+}
+
+/* Small uppercase label used above sections and on cards. */
+@utility kicker {
+	@apply text-xs font-bold tracking-[0.14em] uppercase;
+}
+
+/* Bebas Neue headline style. */
+@utility display {
+	@apply font-display leading-[0.95] tracking-wide uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+		/* Without this, infinite animations replay every 0.01ms and flicker. */
+		animation-iteration-count: 1 !important;
+	}
+}

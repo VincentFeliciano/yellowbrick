@@ -1,0 +1,315 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/source-sans-3/wght.css';
+
+@theme {
+	--color-brick: #ffc600;
+	--color-brick-soft: #fff4c7;
+	--color-ink: #111316;
+	--color-muted: #686c73;
+	--color-line: #d9d9d9;
+
+	--font-sans: 'Source Sans 3 Variable', 'Source Sans 3', system-ui, sans-serif;
+}
+
+/*
+ * Frames.
+ *
+ * On wide screens every page is a stack of full-screen frames. Each frame is a 16:9 stage
+ * laid out like the mockups (1920×1080), and everything inside is positioned and sized in
+ * percentages of the stage, so it looks the same at any size.
+ *
+ * On phones and portrait tablets the same content stacks in reading order instead.
+ *
+ * The breakpoint `(width >= 900px) and (aspect-ratio >= 5/4)` is repeated below and in the
+ * layout; keep them in step.
+ */
+
+:root {
+	--fs-kicker: 0.75rem;
+	--fs-small: 0.875rem;
+	--fs-body: 1rem;
+	--fs-sub: 1.25rem;
+	--fs-title: 1.75rem;
+	--fs-lead: 1.375rem;
+	--fs-head: 2.25rem;
+	--g-s: 0.5rem;
+	--g-m: 1rem;
+	--g-l: 2rem;
+}
+
+@layer base {
+	body {
+		@apply bg-white font-sans text-ink antialiased;
+	}
+	@media (width >= 900px) and (aspect-ratio >= 5/4) {
+		html {
+			/* Settle on one frame at a time, like turning pages. */
+			scroll-snap-type: y proximity;
+		}
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+}
+
+@layer components {
+	.panel {
+		padding: 2.5rem 1rem;
+		/* Leave room for the fixed header when jumping to a frame. */
+		scroll-margin-top: 3.5rem;
+		background: white;
+	}
+	main > .panel:first-child {
+		padding-top: 6rem;
+	}
+	.stage {
+		display: flex;
+		flex-direction: column;
+		gap: var(--g-l);
+		max-width: 40rem;
+		margin-inline: auto;
+	}
+	.at {
+		min-width: 0;
+	}
+
+	/* The home frame: the big brick rests on .hero-spot. */
+	.panel.hero {
+		display: grid;
+		min-height: 100svh;
+		place-items: center;
+	}
+	.hero-spot {
+		width: min(85vw, 28rem);
+		aspect-ratio: 992 / 836;
+	}
+
+	@media (width >= 900px) and (aspect-ratio >= 5/4) {
+		.panel,
+		main > .panel:first-child {
+			display: grid;
+			height: 100svh;
+			padding: 0;
+			overflow: hidden;
+			place-items: center;
+			scroll-margin-top: 0;
+			scroll-snap-align: start;
+		}
+		.stage {
+			display: block;
+			position: relative;
+			width: min(100%, 100svh * 16 / 9);
+			max-width: none;
+			margin: 0;
+			aspect-ratio: 16 / 9;
+			/* Lets everything inside be sized relative to the frame (cqh). */
+			container-type: size;
+
+			--fs-kicker: 1.48cqh;
+			--fs-small: 1.75cqh;
+			--fs-body: 2.1cqh;
+			--fs-sub: 2.9cqh;
+			--fs-title: 4.4cqh;
+			--fs-lead: 3.51cqh;
+			--fs-head: 6cqh;
+			--g-s: 0.9cqh;
+			--g-m: 1.8cqh;
+			--g-l: 3.6cqh;
+		}
+		/* Regions: placed with the --l/--t/--w/--h values from #lib/layout. */
+		.at {
+			position: absolute;
+			left: var(--l);
+			top: var(--t);
+			width: var(--w);
+			height: var(--h, auto);
+		}
+		.hero-spot {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: 54.6%;
+			translate: -50% -50%;
+		}
+	}
+
+	/* Type. */
+	.t-kicker {
+		font-size: var(--fs-kicker);
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		line-height: 1.2;
+		text-transform: uppercase;
+		color: var(--color-muted);
+	}
+	.t-head {
+		font-size: var(--fs-head);
+		font-weight: 700;
+		letter-spacing: -0.015em;
+		line-height: 1.02;
+		text-wrap: balance;
+	}
+	.t-title {
+		font-size: var(--fs-title);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		line-height: 1.05;
+		text-wrap: balance;
+	}
+	.t-sub {
+		font-size: var(--fs-sub);
+		font-weight: 700;
+		line-height: 1.15;
+	}
+	.t-lead {
+		font-size: var(--fs-lead);
+		line-height: 1.214;
+		color: var(--color-muted);
+	}
+	.t-body {
+		font-size: var(--fs-body);
+		line-height: 1.4;
+	}
+	.t-small {
+		font-size: var(--fs-small);
+		line-height: 1.4;
+	}
+	.muted {
+		color: var(--color-muted);
+	}
+
+	/* Layout helpers that scale with the frame. */
+	.stack {
+		display: flex;
+		flex-direction: column;
+		gap: var(--g-m);
+	}
+	.gap-s {
+		gap: var(--g-s);
+	}
+	.gap-l {
+		gap: var(--g-l);
+	}
+	/* A stack whose last child (usually a placeholder image) takes up the leftover height. */
+	.fill > :last-child {
+		flex: 1;
+		min-height: 0;
+	}
+
+	/* Links and buttons. */
+	.more {
+		align-self: flex-start;
+		font-weight: 600;
+		text-decoration: underline;
+		text-decoration-color: var(--color-brick);
+		text-decoration-thickness: 0.15em;
+		text-underline-offset: 0.25em;
+	}
+	.more::after {
+		content: ' →';
+	}
+	.more:hover {
+		text-decoration-color: currentColor;
+	}
+	.btn {
+		display: inline-flex;
+		align-self: flex-start;
+		align-items: center;
+		padding: 0.65em 1.3em;
+		background: var(--color-ink);
+		color: white;
+		font-size: var(--fs-body);
+		font-weight: 600;
+	}
+	.btn:hover {
+		background: black;
+	}
+	.btn:disabled {
+		opacity: 0.6;
+	}
+	a:focus-visible,
+	button:focus-visible {
+		outline: 3px solid var(--color-brick);
+		outline-offset: 3px;
+	}
+
+	/* Service cards: a rule on top, yellow on hover. */
+	.cards {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--g-m);
+	}
+	.card {
+		display: flex;
+		flex-direction: column;
+		gap: var(--g-s);
+		height: 100%;
+		padding: var(--g-m);
+		border-top: 2px solid var(--color-ink);
+		transition: background-color 0.2s;
+	}
+	.card:hover {
+		background: var(--color-brick);
+	}
+	.card > :last-child {
+		margin-top: auto;
+	}
+
+	/* A project: its picture takes the leftover height, with the caption underneath. */
+	.project {
+		display: flex;
+		flex-direction: column;
+		gap: var(--g-s);
+		height: 100%;
+	}
+	.project > :first-child {
+		flex: 1;
+		min-height: 0;
+		margin-bottom: var(--g-s);
+	}
+	.project:hover .t-sub {
+		text-decoration: underline;
+		text-decoration-color: var(--color-brick);
+		text-decoration-thickness: 0.15em;
+	}
+	li:has(> .project) {
+		flex: 1;
+		min-height: 0;
+	}
+
+	/* The yellow "let's talk" block. */
+	.cta {
+		justify-content: flex-end;
+		padding: var(--g-l);
+		background: var(--color-brick);
+	}
+
+	@media not ((width >= 900px) and (aspect-ratio >= 5/4)) {
+		.cards {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	/* Lists with a small yellow square for a bullet. */
+	.bullets {
+		display: flex;
+		flex-direction: column;
+		gap: var(--g-s);
+	}
+	.bullets li {
+		position: relative;
+		padding-left: 1.1em;
+	}
+	.bullets li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0.5em;
+		width: 0.45em;
+		height: 0.45em;
+		background: var(--color-brick);
+		box-shadow: 0 0 0 1px var(--color-ink);
+	}
+}
