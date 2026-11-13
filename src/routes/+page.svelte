@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { asset, resolve } from '$app/paths';
-	import { PILLARS, PROJECTS, SITE, usd, T2, T3, T4 } from '#lib';
+	import { resolve } from '$app/paths';
+	import { PILLARS, PROJECTS, SITE, scrollFrames, usd, T2, T3, T4 } from '#lib';
 	import Frame from '#lib/components/Frame.svelte';
-	import Picture from '#lib/components/Picture.svelte';
-	import Placeholder from '#lib/components/Placeholder.svelte';
+	import ProjectImage from '#lib/components/ProjectImage.svelte';
+	import ScrollScene from '#lib/components/ScrollScene.svelte';
 
-	const [featured, ...others] = PROJECTS;
+	// One big project and the next three; the rest are on the work page.
+	const [featured, ...others] = PROJECTS.slice(0, 4);
+
+	const officeFrames = scrollFrames('office-scroll');
+	const portraitFrames = scrollFrames('office-portrait-scroll');
 </script>
 
 <svelte:head>
@@ -30,11 +34,11 @@
 	</div>
 
 	<div class="at" style={T2.a}>
-		<Picture
-			src={asset('images/studio-at-work.png')}
-			alt="Drawing of the studio at work: a desk set up, people building at their computers, and a call coming in."
-			width={1920}
-			height={1080}
+		<ScrollScene
+			frames={officeFrames}
+			alt="LEGO model of the Yellowbrick office: two people at a shared desk under the yellow brick logo, with sunlight coming in through the windows."
+			width={960}
+			height={660}
 		/>
 	</div>
 
@@ -64,13 +68,13 @@
 <Frame id="work">
 	<div class="at stack gap-s" style={T3.lead}>
 		<h2 class="t-kicker">Selected work</h2>
-		<p class="t-lead">Demo projects showing how we solve everyday problems.</p>
+		<p class="t-lead">Brands, products, websites, and systems we have made.</p>
 		<a href={resolve('/work')} class="more t-body">All work</a>
 	</div>
 
 	<div class="at" style={T3.a}>
 		<a href={resolve('/work/[slug]', { slug: featured.slug })} class="project">
-			<Placeholder label={featured.title} />
+			<ProjectImage project={featured} />
 			<span class="t-kicker">{featured.category}</span>
 			<span class="t-sub">{featured.title}</span>
 			<span class="t-body muted">{featured.summary}</span>
@@ -81,7 +85,7 @@
 		{#each others as project (project.slug)}
 			<li>
 				<a href={resolve('/work/[slug]', { slug: project.slug })} class="project">
-					<Placeholder label={project.title} />
+					<ProjectImage {project} wide />
 					<span class="t-kicker">{project.category}</span>
 					<span class="t-sub">{project.title}</span>
 				</a>
@@ -93,11 +97,11 @@
 <!-- screen4.png: about, and an invitation to get in touch. -->
 <Frame id="about">
 	<div class="at" style={T4.a}>
-		<Picture
-			src={asset('images/office-portrait.png')}
-			alt="Drawing of two people waving in the Yellowbrick office, under the brick and the yellow brick sign."
-			width={709}
-			height={1001}
+		<ScrollScene
+			frames={portraitFrames}
+			alt="LEGO model of two people waving in the Yellowbrick office, under the yellow brick logo on the wall."
+			width={660}
+			height={798}
 		/>
 	</div>
 

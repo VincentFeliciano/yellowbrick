@@ -1,7 +1,22 @@
 <script lang="ts">
-	import { PILLARS, SITE, T2, T4 } from '#lib';
+	import { PILLARS, SITE, scrollFrames, spinFrames, T2, T4 } from '#lib';
 	import Frame from '#lib/components/Frame.svelte';
-	import Placeholder from '#lib/components/Placeholder.svelte';
+	import ScrollScene from '#lib/components/ScrollScene.svelte';
+	import SpinScene from '#lib/components/SpinScene.svelte';
+
+	const officeFrames = scrollFrames('office-scroll');
+	/** LEGO builds for the skills that have one. Clicking the skill shows its model, which can be dragged to turn. */
+	const models: Record<string, { frames: string[][]; alt: string }> = {
+		'Web design': {
+			frames: spinFrames('webdesign-spin', 4, 32),
+			alt: 'LEGO model of a desktop monitor on a blue desk, its screen a web page layout built from plates with the words WEB DESIGN across it.'
+		},
+		'3D printing': {
+			frames: spinFrames('printer-spin', 4, 32),
+			alt: 'LEGO model of a resin 3D printer: a grey base with a blue screen and a see-through orange cover over the build platform.'
+		}
+	};
+	let shown = $state('3D printing');
 
 	const values = [
 		{
@@ -20,6 +35,8 @@
 
 	const skills = [
 		'Brand identity',
+		'Graphic design',
+		'Package design',
 		'Web design',
 		'Front-end development',
 		'Web applications',
@@ -47,7 +64,12 @@
 	</div>
 
 	<div class="at" style={T2.a}>
-		<Placeholder label="The studio in {SITE.location}" />
+		<ScrollScene
+			frames={officeFrames}
+			alt="LEGO model of the Yellowbrick office: two people at a shared desk under the yellow brick logo, with sunlight coming in through the windows."
+			width={960}
+			height={660}
+		/>
 	</div>
 
 	<div class="at stack gap-l" style={T2.b}>
@@ -98,11 +120,21 @@
 			<h3 class="t-kicker">Skills</h3>
 			<ul class="skills t-small">
 				{#each skills as skill (skill)}
-					<li>{skill}</li>
+					<li>
+						{#if models[skill]}
+							<button type="button" aria-pressed={shown === skill} onclick={() => (shown = skill)}>
+								{skill}
+							</button>
+						{:else}
+							<span>{skill}</span>
+						{/if}
+					</li>
 				{/each}
 			</ul>
 		</div>
-		<Placeholder label="Workbench and 3D printer" />
+		{#key shown}
+			<SpinScene frames={models[shown].frames} alt={models[shown].alt} size={640} />
+		{/key}
 	</div>
 </Frame>
 
@@ -125,9 +157,22 @@
 		gap: var(--g-s);
 	}
 
-	.skills li {
+	.skills li > * {
+		display: block;
 		padding: 0.3em 0.75em;
 		border: 1px solid var(--color-ink);
+	}
+
+	/* Skills with a LEGO model to show. */
+	.skills button {
+		border-width: 2px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.skills button:hover,
+	.skills button[aria-pressed='true'] {
+		background: var(--color-brick);
 	}
 
 	@media not ((width >= 900px) and (aspect-ratio >= 5/4)) {

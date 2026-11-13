@@ -38,8 +38,8 @@
 		<div class="stack gap-s">
 			<h2 class="t-kicker">Demo projects</h2>
 			<p class="t-small">
-				The projects on this site are demonstrations, made to show how we work. They are not
-				client work.
+				Projects marked as a demo project are demonstrations, made to show how we work. They are
+				not client work.
 			</p>
 		</div>
 	</div>
