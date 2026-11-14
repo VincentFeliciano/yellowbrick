@@ -8,12 +8,12 @@
 	/** LEGO builds for the skills that have one. Clicking the skill shows its model, which can be dragged to turn. */
 	const models: Record<string, { frames: string[][]; alt: string }> = {
 		'Web design': {
-			frames: spinFrames('webdesign-spin', 4, 32),
-			alt: 'LEGO model of a desktop monitor on a blue desk, its screen a web page layout built from plates with the words WEB DESIGN across it.'
+			frames: spinFrames('webdesign-view', 4, 9),
+			alt: 'LEGO model of a desktop monitor on a blue desk, its screen a web page layout built from plates with the words WEB DESIGN across it, with plants, a chair, and a window of brown posts behind.'
 		},
 		'3D printing': {
-			frames: spinFrames('printer-spin', 4, 32),
-			alt: 'LEGO model of a resin 3D printer: a grey base with a blue screen and a see-through orange cover over the build platform.'
+			frames: spinFrames('printer-view', 4, 9),
+			alt: 'LEGO model of a resin 3D printer: a grey base with a blue screen and a see-through orange cover over the build platform, on a silver bench against a white wall, beside shelves of binders.'
 		}
 	};
 	let shown = $state('3D printing');
@@ -133,7 +133,7 @@
 			</ul>
 		</div>
 		{#key shown}
-			<SpinScene frames={models[shown].frames} alt={models[shown].alt} size={640} />
+			<SpinScene frames={models[shown].frames} alt={models[shown].alt} size={640} start={[1, 4]} wrap={false} />
 		{/key}
 	</div>
 </Frame>

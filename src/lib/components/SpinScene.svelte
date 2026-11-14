@@ -5,8 +5,11 @@
 	 * A pre-rendered 3D model in a Picture-style box that turns when it is dragged.
 	 *
 	 * `frames` is a grid of renders: one row per camera height (lowest first), and in each row one
-	 * frame per step of a full turn. Dragging sideways steps through a row, dragging up and down
+	 * frame per step of a turn. Dragging sideways steps through a row, dragging up and down
 	 * moves between rows. The arrow keys do the same.
+	 *
+	 * With `wrap` the row is a full turn and goes round and round. Without it the row is a short
+	 * swing from the viewer's left to the right, and the view stops at either end.
 	 *
 	 * The starting frame is a plain <img>, so the box looks right before the script runs. The rest
 	 * only start loading when the box comes near the screen, and are drawn onto a canvas over it.
@@ -17,9 +20,16 @@
 		alt,
 		size,
 		start = [1, 2],
+		wrap = true,
 		paper = 'white'
-	}: { frames: string[][]; alt: string; size: number; start?: [number, number]; paper?: string } =
-		$props();
+	}: {
+		frames: string[][];
+		alt: string;
+		size: number;
+		start?: [number, number];
+		wrap?: boolean;
+		paper?: string;
+	} = $props();
 
 	let box: HTMLDivElement;
 	let canvas: HTMLCanvasElement;
@@ -48,7 +58,7 @@
 
 		function turn(r: number, c: number) {
 			row = Math.min(rows - 1, Math.max(0, r));
-			col = ((c % cols) + cols) % cols;
+			col = wrap ? ((c % cols) + cols) % cols : Math.min(cols - 1, Math.max(0, c));
 			turned = true;
 			draw();
 		}
@@ -88,7 +98,9 @@
 			if (!dragging) return;
 			const r = box.getBoundingClientRect();
 			// A full turn takes a drag of about one and a half box widths; the heights span one box height.
-			const dc = Math.round(((e.clientX - from.x) / r.width) * cols * 0.66);
+			// A short swing follows the hand: dragging to the left brings the view round from the right.
+			const dx = (e.clientX - from.x) / r.width;
+			const dc = Math.round(wrap ? dx * cols * 0.66 : -dx * cols * 1.2);
 			const dr = Math.round(((e.clientY - from.y) / r.height) * rows);
 			turn(from.row + dr, from.col + dc);
 		}
@@ -133,13 +145,13 @@
 	style:background={paper}
 	bind:this={box}
 	role="img"
-	aria-label="{alt} Drag or use the arrow keys to turn it."
+	aria-label="{alt} Drag or use the arrow keys to {wrap ? 'turn it' : 'look around'}."
 	tabindex="0"
 >
 	<img src={frames[start[0]][start[1]]} alt="" width={size} height={size} decoding="async" draggable="false" />
 	<canvas bind:this={canvas} width={size} height={size} aria-hidden="true"></canvas>
 	{#if !turned}
-		<span class="hint t-small">Drag to turn</span>
+		<span class="hint t-small">{wrap ? 'Drag to turn' : 'Drag to look around'}</span>
 	{/if}
 </div>
 
@@ -169,7 +181,7 @@
 		position: absolute;
 		inset: 0;
 		height: 100%;
-		object-fit: contain;
+		object-fit: cover;
 	}
 
 	.hint {
@@ -188,7 +200,7 @@
 
 		img {
 			height: 100%;
-			object-fit: contain;
+			object-fit: cover;
 		}
 	}
 </style>

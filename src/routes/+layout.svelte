@@ -26,6 +26,13 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
+<!-- The wordmark sits behind everything on wide screens: the page's content floats over it as it scrolls. -->
+<div class="backdrop" aria-hidden="true">
+	<div class="backdrop-stage">
+		<img class="wordmark" src={asset('brand/wordmark.svg')} alt="" width="628" height="95" />
+	</div>
+</div>
+
 <main>
 	{@render children()}
 </main>
@@ -44,7 +51,10 @@
 
 <Brick bind:inside />
 
-<!-- Links and wordmark: fixed to the screen, on top of the content. -->
+<!-- A plain white bar behind the links and the top of the brick; the page scrolls away under it. -->
+<div class="topbar"></div>
+
+<!-- Links: fixed to the screen, on top of the content. -->
 <div class="chrome">
 	<div class="chrome-stage">
 		<!-- The brick itself ignores clicks, so the spot under it is the link home. -->
@@ -62,10 +72,6 @@
 			<a href={resolve('/contact')} aria-current={current(resolve('/contact'))}>Contact</a>
 			<a href="mailto:{SITE.email}" class="wide-only">{SITE.email}</a>
 		</nav>
-
-		<a href={resolve('/')} class="wordmark">
-			<img src={asset('brand/wordmark.svg')} alt="Yellowbrick home" width="628" height="95" />
-		</a>
 	</div>
 </div>
 
@@ -76,7 +82,6 @@
 		inset: 0 0 auto;
 		z-index: 30;
 		height: 3.5rem;
-		border-bottom: 1px solid var(--color-line);
 		background: white;
 	}
 
@@ -125,7 +130,8 @@
 	}
 
 	.wide-only,
-	.wordmark {
+	.backdrop,
+	.topbar {
 		display: none;
 	}
 
@@ -203,17 +209,46 @@
 			display: inline;
 		}
 
+		/* The frames are see-through, so the wordmark shows wherever a frame leaves the corner empty. */
+		main {
+			position: relative;
+			z-index: 1;
+		}
+
+		.backdrop {
+			display: grid;
+			position: fixed;
+			inset: 0;
+			z-index: 0;
+			place-items: center;
+			pointer-events: none;
+		}
+
+		.backdrop-stage {
+			position: relative;
+			width: min(100%, 100svh * 16 / 9);
+			aspect-ratio: 16 / 9;
+		}
+
 		/* Moved up from the mockups' 90% so the bottom of the screen stays clear. */
 		.wordmark {
 			display: block;
+			position: absolute;
 			left: 66.56%;
 			top: 81%;
 			width: 32.71%;
 		}
 
-		.wordmark img {
+		/* From the top of the screen to just under the links, whatever the stage's size. */
+		.topbar {
+			--stage-h: min(100svh, 100vw * 9 / 16);
+
 			display: block;
-			width: 100%;
+			position: fixed;
+			inset: 0 0 auto;
+			z-index: 29;
+			height: calc((100svh - var(--stage-h)) / 2 + var(--stage-h) * 0.08);
+			background: white;
 		}
 
 		.phone-footer {

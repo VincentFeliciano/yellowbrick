@@ -8,8 +8,9 @@
 	 * floor) to below (looking up at the ceiling). The frame follows the box's place on screen: the
 	 * first as the box comes in at the bottom, the last as it leaves at the top.
 	 *
-	 * While the view is moving the picture is blended from the two frames around it. It always
-	 * comes to rest on a whole frame.
+	 * The picture follows the scroll exactly, blended from the two frames around the spot, so it
+	 * moves as smoothly as the page does. A moment after scrolling stops it settles on the nearest
+	 * whole frame, which is sharper than a blend.
 	 *
 	 * The middle frame is a plain <img>, so the box looks right before the script runs and when
 	 * reduced motion is on. The rest only start loading when the box comes near the screen, and
@@ -33,9 +34,10 @@
 		const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
 		const ctx = canvas.getContext('2d');
 		const images: HTMLImageElement[] = [];
-		let wanted = Math.floor(count / 2); // frame wanted by the box's place on screen
+		let wanted = Math.floor(count / 2); // frame wanted by the box's place on screen, a fraction while scrolling
 		let at = wanted; // where the picture is now
 		let frame = 0;
+		let rest = 0;
 		let drawn = '';
 
 		const loaded = (i: number) => images[i]?.complete && images[i].naturalWidth > 0;
@@ -46,7 +48,7 @@
 			if (!ctx || motion.matches) return;
 			const i0 = Math.min(Math.floor(at), count - 1);
 			const i1 = Math.min(i0 + 1, count - 1);
-			const f = Math.round((at - i0) * 50) / 50;
+			const f = Math.round((at - i0) * 100) / 100;
 			if (!loaded(i0) || !loaded(i1)) return;
 			const key = `${i0},${f}`;
 			if (key === drawn) return;
@@ -60,22 +62,31 @@
 			}
 		}
 
-		/** Eases the picture towards the wanted frame. */
+		/** Moves the picture most of the way to the wanted spot each frame: close behind the scroll, without jumps. */
 		function step() {
 			frame = 0;
-			at += (wanted - at) * 0.18;
-			if (Math.abs(wanted - at) < 0.01) at = wanted;
+			at += (wanted - at) * 0.5;
+			if (Math.abs(wanted - at) < 0.005) at = wanted;
 			else frame = requestAnimationFrame(step);
 			draw();
 		}
+
+		const go = () => {
+			if (!frame) frame = requestAnimationFrame(step);
+		};
 
 		function place() {
 			const r = box.getBoundingClientRect();
 			const vh = window.innerHeight;
 			// 0 as the box comes in at the bottom of the screen, 1 as it leaves at the top.
-			// Always a whole frame: a blend of two is soft and doubles the edges.
-			wanted = Math.round(clamp((vh - r.top) / (vh + r.height), 0, 1) * (count - 1));
-			if (!frame) frame = requestAnimationFrame(step);
+			wanted = clamp((vh - r.top) / (vh + r.height), 0, 1) * (count - 1);
+			go();
+			// Once the page has stopped, settle on a whole frame: a blend of two is a little soft.
+			clearTimeout(rest);
+			rest = window.setTimeout(() => {
+				wanted = Math.round(wanted);
+				go();
+			}, 180);
 		}
 
 		/** Loads every frame, the ones next to the middle first. */
@@ -122,6 +133,7 @@
 			window.removeEventListener('resize', place);
 			motion.removeEventListener('change', onMotion);
 			cancelAnimationFrame(frame);
+			clearTimeout(rest);
 		};
 	});
 </script>

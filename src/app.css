@@ -96,6 +96,8 @@
 			place-items: center;
 			scroll-margin-top: 0;
 			scroll-snap-align: start;
+			/* See-through: the wordmark is fixed behind the frames (see the layout). */
+			background: none;
 		}
 		.stage {
 			display: block;

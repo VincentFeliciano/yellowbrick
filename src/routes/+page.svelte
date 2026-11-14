@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { asset, resolve } from '$app/paths';
 	import { PILLARS, PROJECTS, SITE, scrollFrames, usd, T2, T3, T4 } from '#lib';
 	import Frame from '#lib/components/Frame.svelte';
 	import ProjectImage from '#lib/components/ProjectImage.svelte';
@@ -116,6 +116,18 @@
 	</div>
 
 	<div class="at stack cta" style={T4.c}>
+		<!-- A see-through picture that turns by itself, so the brain hovers on the yellow with no box round it. -->
+		<picture class="mind">
+			<source media="(prefers-reduced-motion: reduce)" srcset={asset('images/brain/brain-still.webp')} />
+			<img
+				src={asset('images/brain/brain-turn.webp')}
+				alt="A LEGO brain in pink, salmon, and tan, turning slowly."
+				width="360"
+				height="360"
+				loading="lazy"
+				decoding="async"
+			/>
+		</picture>
 		<h2 class="t-head">Have a project in mind?</h2>
 		<p class="t-body">We reply within one business day.</p>
 		<a href={resolve('/contact')} class="btn">Let’s talk</a>
@@ -128,3 +140,31 @@
 	</div>
 </Frame>
 
+<style>
+	/* The turning brain above "Have a project in mind?": centred in the yellow box, pushed up by the copy below it. */
+	.mind {
+		width: min(70%, 22rem);
+		margin: 0 auto auto;
+	}
+
+	.mind img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.mind img {
+			animation: hover 5s ease-in-out infinite alternate;
+		}
+	}
+
+	@keyframes hover {
+		from {
+			transform: translateY(-3%);
+		}
+		to {
+			transform: translateY(3%);
+		}
+	}
+</style>
